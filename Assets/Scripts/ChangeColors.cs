@@ -4,7 +4,12 @@ using TMPro;
 public class ChangeColors : MonoBehaviour
 {
     public GameObject[] fragments = new GameObject[5];
+
+    public GameObject[] arrows = new GameObject[5];
+
+    public GameObject canvas;
     public TextMeshProUGUI[] fragmentNames = new TextMeshProUGUI[5];
+    private CollisionChecker collisionChecker;
 
     private Color[] colors = new Color[5]
     {
@@ -26,6 +31,13 @@ public class ChangeColors : MonoBehaviour
 
     void Start()
     {
+        collisionChecker = FindObjectOfType<CollisionChecker>();
+
+        if (collisionChecker == null)
+        {
+            Debug.LogError("Nenhum CollisionChecker foi encontrado na cena!");
+        }
+
         fragmentsOriginalColors = new Color[fragments.Length];
         fragmentNamesOriginalColors = new Color[fragmentNames.Length];
 
@@ -56,14 +68,16 @@ public class ChangeColors : MonoBehaviour
 
         if (areAllFragmentsWithinMargin != wereAllFragmentsWithinMargin)
         {
-            ChangeFragmentColors();
             wereAllFragmentsWithinMargin = areAllFragmentsWithinMargin;
+            ChangeFragmentColors();
+            ActivateObjects();
+
+            if (collisionChecker.allColliding)
+            {
+                ChangeNameColors();
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            ChangeNameColors();
-        }
     }
 
     bool AllFragmentsWithinMargin()
@@ -101,6 +115,20 @@ public class ChangeColors : MonoBehaviour
         }
 
         isFragmentOriginalColor = !isFragmentOriginalColor;
+    }
+
+    void ActivateObjects()
+    {
+        for (int i = 0; i < arrows.Length; i++)
+        {
+            if (arrows[i] != null)
+            {
+                arrows[i].SetActive(wereAllFragmentsWithinMargin);
+            }
+            
+        }
+
+        canvas.SetActive(wereAllFragmentsWithinMargin);
     }
 
     void ChangeNameColors()

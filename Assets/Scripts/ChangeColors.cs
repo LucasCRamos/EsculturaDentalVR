@@ -7,7 +7,10 @@ public class ChangeColors : MonoBehaviour
 
     public GameObject[] arrows = new GameObject[5];
 
-    public GameObject canvas;
+    public GameObject canvasSegundaEtapa;
+
+    public bool areAllFragmentsWithinMargin;
+
     public TextMeshProUGUI[] fragmentNames = new TextMeshProUGUI[5];
     private CollisionChecker collisionChecker;
 
@@ -27,7 +30,7 @@ public class ChangeColors : MonoBehaviour
     private bool isFragmentNameOriginalColor = true;
     private bool wereAllFragmentsWithinMargin = false;
 
-    private const float margin = 0.1f;
+    private const float margin = 0.01f;
 
     void Start()
     {
@@ -64,7 +67,7 @@ public class ChangeColors : MonoBehaviour
 
     void Update()
     {
-        bool areAllFragmentsWithinMargin = AllFragmentsWithinMargin();
+        areAllFragmentsWithinMargin = AllFragmentsWithinMargin();
 
         if (areAllFragmentsWithinMargin != wereAllFragmentsWithinMargin)
         {
@@ -82,15 +85,20 @@ public class ChangeColors : MonoBehaviour
 
     bool AllFragmentsWithinMargin()
     {
+        if (fragments == null)
+            return true;
+
+        Vector3 referencePosition = fragments[0]?.transform.position ?? Vector3.zero;
+
         foreach (var fragment in fragments)
         {
             if (fragment != null)
             {
-                Vector3 localPosition = fragment.transform.localPosition;
+                Vector3 position = fragment.transform.position;
 
-                if (Mathf.Abs(localPosition.x) > margin ||
-                    Mathf.Abs(localPosition.y) > margin ||
-                    Mathf.Abs(localPosition.z) > margin)
+                if (Mathf.Abs(position.x - referencePosition.x) > margin ||
+                    Mathf.Abs(position.y - referencePosition.y) > margin ||
+                    Mathf.Abs(position.z - referencePosition.z) > margin)
                 {
                     return false;
                 }
@@ -119,16 +127,7 @@ public class ChangeColors : MonoBehaviour
 
     void ActivateObjects()
     {
-        for (int i = 0; i < arrows.Length; i++)
-        {
-            if (arrows[i] != null)
-            {
-                arrows[i].SetActive(wereAllFragmentsWithinMargin);
-            }
-            
-        }
-
-        canvas.SetActive(wereAllFragmentsWithinMargin);
+        canvasSegundaEtapa.SetActive(wereAllFragmentsWithinMargin);
     }
 
     void ChangeNameColors()

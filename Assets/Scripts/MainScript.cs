@@ -1,13 +1,13 @@
 using UnityEngine;
 using TMPro;
 
-public class ChangeColors : MonoBehaviour
+public class MainScript : MonoBehaviour
 {
     public GameObject[] fragments = new GameObject[5];
 
-    public GameObject[] arrows = new GameObject[5];
-
     public GameObject canvasSegundaEtapa;
+
+    public GameObject[] hideObjects = new GameObject[6];
 
     public bool areAllFragmentsWithinMargin;
 
@@ -108,6 +108,12 @@ public class ChangeColors : MonoBehaviour
         return true;
     }
 
+    public void QuitApplication() {
+
+         Application.Quit();
+         
+    }
+
     void ChangeFragmentColors()
     {
         for (int i = 0; i < fragments.Length; i++)
@@ -128,6 +134,14 @@ public class ChangeColors : MonoBehaviour
     void ActivateObjects()
     {
         canvasSegundaEtapa.SetActive(wereAllFragmentsWithinMargin);
+
+        for (int i = 0; i < hideObjects.Length; i++)
+        {
+            if (hideObjects[i] != null)
+            {
+                hideObjects[i].SetActive(false);
+            }
+        }
     }
 
     void ChangeNameColors()

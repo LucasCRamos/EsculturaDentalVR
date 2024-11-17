@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System;
 using TMPro;
 
@@ -135,10 +136,14 @@ public class MainScript : MonoBehaviour
 
     }
 
-    public void QuitApplication() {
+    public void LoadScene()
+    {
+        SceneManager.LoadScene(0);   
+    }
 
+    public void QuitApplication()
+    {
          Application.Quit();
-         
     }
 
     void ChangeFragmentColors()

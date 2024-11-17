@@ -1,16 +1,32 @@
 using UnityEngine;
+using System;
 using TMPro;
 
 public class MainScript : MonoBehaviour
 {
+
+    public GameObject[] objectsToShowFirstState;
+
+    public GameObject[] objectsToHideFirstState;
+
+    public GameObject canvasToGoToSecondState;
+
+    public GameObject[] objectsToShowSecondState;
+
+    public GameObject[] objectsToHideSecondState;
+
+    public GameObject[] objectsToShowThirdState;
+
+    public GameObject[] objectsToHideThirdState;
+    public int gameState = 0;
+
+    public int previousGameState = 0;
+
+    private bool fragmentColorsChanged = false;
+
+    private bool fragmentNamesColorsChanged = false;
+
     public GameObject[] fragments = new GameObject[5];
-
-    public GameObject canvasSegundaEtapa;
-
-    public GameObject[] hideObjects = new GameObject[6];
-
-    public bool areAllFragmentsWithinMargin;
-
     public TextMeshProUGUI[] fragmentNames = new TextMeshProUGUI[5];
     private CollisionChecker collisionChecker;
 
@@ -23,89 +39,100 @@ public class MainScript : MonoBehaviour
         Color.magenta
     };
 
-    private Color[] fragmentsOriginalColors;
-    private Color[] fragmentNamesOriginalColors;
-
-    private bool isFragmentOriginalColor = true;
-    private bool isFragmentNameOriginalColor = true;
-    private bool wereAllFragmentsWithinMargin = false;
-
-    private const float margin = 0.01f;
+    public void ChangeGameState()
+    {
+        gameState = gameState + 1;
+    }
 
     void Start()
     {
         collisionChecker = FindObjectOfType<CollisionChecker>();
-
-        if (collisionChecker == null)
-        {
-            Debug.LogError("Nenhum CollisionChecker foi encontrado na cena!");
-        }
-
-        fragmentsOriginalColors = new Color[fragments.Length];
-        fragmentNamesOriginalColors = new Color[fragmentNames.Length];
-
-        for (int i = 0; i < fragments.Length; i++)
-        {
-            if (fragments[i] != null)
-            {
-                Renderer renderer = fragments[i].GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    fragmentsOriginalColors[i] = renderer.material.color;
-                }
-            }
-        }
-
-        for (int i = 0; i < fragmentNames.Length; i++)
-        {
-            if (fragmentNames[i] != null)
-            {
-                fragmentNamesOriginalColors[i] = fragmentNames[i].color;
-            }
-        }
     }
 
     void Update()
     {
-        areAllFragmentsWithinMargin = AllFragmentsWithinMargin();
 
-        if (areAllFragmentsWithinMargin != wereAllFragmentsWithinMargin)
+        if (gameState != previousGameState)
         {
-            wereAllFragmentsWithinMargin = areAllFragmentsWithinMargin;
-            ChangeFragmentColors();
-            ActivateObjects();
 
-            if (collisionChecker.allColliding)
+            switch (gameState)
             {
-                ChangeNameColors();
+                case 0: // fase do menu
+                    break;
+                case 1: // fase do puzzle
+                    foreach (GameObject obj in objectsToShowFirstState)
+                    {
+                        obj.SetActive(true);
+                    }
+                    foreach (GameObject obj in objectsToHideFirstState)
+                    {
+                        obj.SetActive(false);
+                    }
+                    break;
+                case 2: // fase da associacao dos nomes
+                    foreach (GameObject obj in objectsToShowSecondState)
+                    {
+                        obj.SetActive(true);
+                    }
+                    foreach (GameObject obj in objectsToHideSecondState)
+                    {
+                        obj.SetActive(false);
+                    }
+                    break;
+                case 3: // fase da conclusao
+                    ChangeNameColors();
+                    foreach (GameObject obj in objectsToShowThirdState)
+                    {
+                        obj.SetActive(true);
+                    }
+                    foreach (GameObject obj in objectsToHideThirdState)
+                    {
+                        obj.SetActive(false);
+                    }
+                    break;
+                default:
+                    Debug.Log("Estado não reconhecido.");
+                    break;
             }
+
+            previousGameState = gameState;
         }
 
-    }
-
-    bool AllFragmentsWithinMargin()
-    {
-        if (fragments == null)
-            return true;
-
-        Vector3 referencePosition = fragments[0]?.transform.position ?? Vector3.zero;
-
-        foreach (var fragment in fragments)
+        if (collisionChecker.allCollidingFirstState && !fragmentColorsChanged)
         {
-            if (fragment != null)
-            {
-                Vector3 position = fragment.transform.position;
+            ChangeFragmentColors();
 
-                if (Mathf.Abs(position.x - referencePosition.x) > margin ||
-                    Mathf.Abs(position.y - referencePosition.y) > margin ||
-                    Mathf.Abs(position.z - referencePosition.z) > margin)
+            canvasToGoToSecondState.SetActive(true);
+
+            fragmentColorsChanged = true;
+
+        }
+
+        if (collisionChecker.allCollidingSecondState && !fragmentNamesColorsChanged)
+        {
+            ChangeGameState();
+
+            fragmentNamesColorsChanged = true;
+
+            foreach (GameObject obj in objectsToHideThirdState)
+            {
+                var scriptType = Type.GetType("HandGrabInteractable");
+
+                if (scriptType != null)
                 {
-                    return false;
+                    var scriptToDisable = obj.GetComponent(scriptType) as MonoBehaviour;
+                    if (scriptToDisable != null)
+                    {
+                        scriptToDisable.enabled = false;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"O script {scriptType.Name} não foi encontrado no objeto {obj.name}.");
+                    }
                 }
             }
         }
 
-        return true;
     }
 
     public void QuitApplication() {
@@ -118,42 +145,17 @@ public class MainScript : MonoBehaviour
     {
         for (int i = 0; i < fragments.Length; i++)
         {
-            if (fragments[i] != null)
-            {
-                Renderer renderer = fragments[i].GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    renderer.material.color = isFragmentOriginalColor ? colors[i] : fragmentsOriginalColors[i];
-                }
-            }
+            Renderer renderer = fragments[i].GetComponent<Renderer>();
+            renderer.material.color = colors[i];
         }
 
-        isFragmentOriginalColor = !isFragmentOriginalColor;
-    }
-
-    void ActivateObjects()
-    {
-        canvasSegundaEtapa.SetActive(wereAllFragmentsWithinMargin);
-
-        for (int i = 0; i < hideObjects.Length; i++)
-        {
-            if (hideObjects[i] != null)
-            {
-                hideObjects[i].SetActive(false);
-            }
-        }
     }
 
     void ChangeNameColors()
     {
         for (int i = 0; i < fragmentNames.Length; i++)
         {
-            if (fragmentNames[i] != null)
-            {
-                fragmentNames[i].color = isFragmentNameOriginalColor ? colors[i] : fragmentNamesOriginalColors[i];
-            }
+            fragmentNames[i].color = colors[i];
         }
-
-        isFragmentNameOriginalColor = !isFragmentNameOriginalColor;
     }
 }

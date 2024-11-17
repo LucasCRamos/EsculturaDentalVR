@@ -3,29 +3,33 @@ using UnityEngine;
 
 public class CollisionChecker : MonoBehaviour
 {
-    public List<GameObject> arrows;
-    public List<GameObject> texts;
-    public bool allColliding;
+    public List<GameObject> targetObjectsFirstState;
+    public List<GameObject> fittingObjectFirstState;
+    public List<GameObject> targetObjectsSecondState;
+    public List<GameObject> fittingObjectSecondState;
+    public bool allCollidingFirstState;
+    public bool allCollidingSecondState;
 
     void Update()
     {
 
-        allColliding = AllPairsColliding();
+        allCollidingFirstState = AllPairsCollidingFirstState();
+        allCollidingSecondState = AllPairsCollidingSecondState();
     }
 
-    bool AllPairsColliding()
+    bool AllPairsCollidingFirstState()
     {
-        foreach (GameObject arrow in arrows)
+        foreach (GameObject targetObject in targetObjectsFirstState)
         {
-            foreach (GameObject text in texts)
+            foreach (GameObject fittingObject in fittingObjectFirstState)
             {
-                if (arrow != null && text != null && arrow.tag == text.tag)
+                if (targetObject.tag == fittingObject.tag)
                 {
-                    Collider arrowCollider = arrow.GetComponent<Collider>();
-                    Collider textCollider = text.GetComponent<Collider>();
+                    Collider targetObjectCollider = targetObject.GetComponent<Collider>();
+                    Collider fittingObjectCollider = fittingObject.GetComponent<Collider>();
 
-                    if (arrowCollider == null || textCollider == null || 
-                        !arrowCollider.bounds.Intersects(textCollider.bounds))
+                    if (
+                        !targetObjectCollider.bounds.Intersects(fittingObjectCollider.bounds))
                     {
                         return false;
                     }
@@ -35,4 +39,28 @@ public class CollisionChecker : MonoBehaviour
 
         return true;
     }
+
+    bool AllPairsCollidingSecondState()
+    {
+        foreach (GameObject targetObject in targetObjectsSecondState)
+        {
+            foreach (GameObject fittingObject in fittingObjectSecondState)
+            {
+                if (targetObject.tag == fittingObject.tag)
+                {
+                    Collider targetObjectCollider = targetObject.GetComponent<Collider>();
+                    Collider fittingObjectCollider = fittingObject.GetComponent<Collider>();
+
+                    if (
+                        !targetObjectCollider.bounds.Intersects(fittingObjectCollider.bounds))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
 }

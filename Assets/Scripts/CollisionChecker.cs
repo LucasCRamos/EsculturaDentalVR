@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,20 +10,11 @@ public class CollisionChecker : MonoBehaviour
     public bool allCollidingFirstState;
     public bool allCollidingSecondState;
 
-    void Start()
+    void Update()
     {
-        StartCoroutine(CheckCollisionsCoroutine());
-    }
 
-    IEnumerator CheckCollisionsCoroutine()
-    {
-        while (true)
-        {
-            allCollidingFirstState = AllPairsCollidingFirstState();
-            allCollidingSecondState = AllPairsCollidingSecondState();
-
-            yield return new WaitForSeconds(0.5f);
-        }
+        allCollidingFirstState = AllPairsCollidingFirstState();
+        allCollidingSecondState = AllPairsCollidingSecondState();
     }
 
     bool AllPairsCollidingFirstState()
@@ -38,7 +28,8 @@ public class CollisionChecker : MonoBehaviour
                     Collider targetObjectCollider = targetObject.GetComponent<Collider>();
                     Collider fittingObjectCollider = fittingObject.GetComponent<Collider>();
 
-                    if (!targetObjectCollider.bounds.Intersects(fittingObjectCollider.bounds))
+                    if (
+                        !targetObjectCollider.bounds.Intersects(fittingObjectCollider.bounds))
                     {
                         return false;
                     }
@@ -60,7 +51,8 @@ public class CollisionChecker : MonoBehaviour
                     Collider targetObjectCollider = targetObject.GetComponent<Collider>();
                     Collider fittingObjectCollider = fittingObject.GetComponent<Collider>();
 
-                    if (!targetObjectCollider.bounds.Intersects(fittingObjectCollider.bounds))
+                    if (
+                        !targetObjectCollider.bounds.Intersects(fittingObjectCollider.bounds))
                     {
                         return false;
                     }
@@ -70,4 +62,5 @@ public class CollisionChecker : MonoBehaviour
 
         return true;
     }
+
 }

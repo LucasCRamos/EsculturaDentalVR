@@ -1,7 +1,10 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System;
 using TMPro;
+using Oculus.Interaction.HandGrab;
+using System.Linq;
+using Oculus.Interaction;
+using System.Collections.Generic;
 
 public class MainScript : MonoBehaviour
 {
@@ -136,14 +139,10 @@ public class MainScript : MonoBehaviour
 
     }
 
-    public void LoadScene()
-    {
-        SceneManager.LoadScene(0);   
-    }
+    public void QuitApplication() {
 
-    public void QuitApplication()
-    {
          Application.Quit();
+         
     }
 
     void ChangeFragmentColors()

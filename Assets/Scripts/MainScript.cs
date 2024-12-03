@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using TMPro;
+using Oculus.Interaction.HandGrab;
+using System.Linq;
+using Oculus.Interaction;
+using System.Collections.Generic;
 
 public class MainScript : MonoBehaviour
 {
